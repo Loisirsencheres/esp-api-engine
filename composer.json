@@ -1,0 +1,31 @@
+{
+    "name": "cac/esp-api-engine",
+    "description": "Crazy Awesome E-Ngine API Client",
+    "keywords": ["Email Service Provider", "esp", "email", "e-ngine"],
+    "homepage": "http://www.crazyawesomecompany.com",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/CrazyAwesomeCompany/esp-api-engine/issues",
+        "source": "https://github.com/CrazyAwesomeCompany/esp-api-engine"
+    },
+    "autoload": {
+        "psr-0": {
+            "\\CAC\\Component\\ESP\\Api\\Engine": "lib/"
+        },
+        "classmap": [ "lib/" ]
+    },
+    "require": {
+        "psr/log": ">=1"
+    },
+    "suggest": {
+        "monolog/monolog": "Adds logging abilities"
+    },
+    "authors": [
+        {
+            "name": "Nick de Groot",
+            "email": "nick@crazyawesomecompany.com",
+            "homepage": "http://www.crazyawesomecompany.com",
+            "role": "Developer"
+        }
+    ]
+}
