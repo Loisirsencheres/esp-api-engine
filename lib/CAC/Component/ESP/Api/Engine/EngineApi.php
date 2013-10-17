@@ -266,15 +266,20 @@ class EngineApi implements LoggerAwareInterface
      *
      * @param integer $mailinglistId
      * @param string  $email
+     * @param array   $columns
      *
      * @return array
      */
-    public function getMailinglistUser($mailinglistId, $email)
+    public function getMailinglistUser($mailinglistId, $email, $columns=array())
     {
+        if (count($columns) == 0) {
+            $columns = array('email', 'firstname', 'infix', 'lastname');
+        }
+    
         $result = $this->performRequest(
             'Subscriber_getByEmail',
             $email,
-            array('email', 'firstname', 'infix', 'lastname'),
+            $columns,
             $mailinglistId
         );
 
