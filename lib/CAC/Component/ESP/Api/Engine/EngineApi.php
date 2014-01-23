@@ -42,6 +42,7 @@ class EngineApi implements LoggerAwareInterface
     {
         $this->config = array_replace_recursive(
             array(
+                "secure" => false,
                 "domain" => "",
                 "path" => "/soap/server.live.php",
                 "customer" => "",
@@ -275,7 +276,7 @@ class EngineApi implements LoggerAwareInterface
         if (count($columns) == 0) {
             $columns = array('email', 'firstname', 'infix', 'lastname');
         }
-    
+
         $result = $this->performRequest(
             'Subscriber_getByEmail',
             $email,
@@ -331,8 +332,8 @@ class EngineApi implements LoggerAwareInterface
             $connection = new \SoapClient(
                 null,
                 array(
-                    "location" => "http://" . $this->config["domain"] . $this->config["path"],
-                    "uri" => "http://" . $this->config["domain"] . $this->config["path"],
+                    "location" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
+                    "uri" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
                     "login" => $this->config["customer"] . "__" . $this->config["user"],
                     "password" => $this->config["password"],
                     "trace" => $this->config["trace"]
