@@ -42,13 +42,15 @@ class EngineApi implements LoggerAwareInterface
     {
         $this->config = array_replace_recursive(
             array(
+                "wsdl" => null,
                 "secure" => false,
                 "domain" => "",
                 "path" => "/soap/server.live.php",
                 "customer" => "",
                 "user" => "",
                 "password" => "",
-                "trace" => false
+                "trace" => false,
+                "mailinglist" => null,
             ),
             $config
         );
@@ -149,6 +151,10 @@ class EngineApi implements LoggerAwareInterface
             $date = date("Y-m-d H:i:s");
         }
 
+        if (null === $mailinglistId) {
+            $mailinglistId = $this->config['mailinglist'];
+        }
+
         // Check if users are set
         if (empty($users)) {
             throw new EngineApiException("No users to send mailing");
@@ -156,10 +162,10 @@ class EngineApi implements LoggerAwareInterface
 
         $result = $this->performRequest(
             'Subscriber_sendMailingToSubscribers',
-            $mailingId,
+            intval($mailingId),
             $date,
             $users,
-            $mailinglistId
+            intval($mailinglistId)
         );
 
         if (!is_numeric($result)) {
@@ -170,6 +176,18 @@ class EngineApi implements LoggerAwareInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Select a Mailinglist
+     *
+     * @param integer $mailinglistId
+     *
+     * @return string
+     */
+    public function selectMailinglist($mailinglistId)
+    {
+        return $this->performRequest('Mailinglist_select', intval($mailinglistId));
     }
 
     /**
@@ -330,10 +348,10 @@ class EngineApi implements LoggerAwareInterface
         if ($this->connection === null) {
             // create a connection
             $connection = new \SoapClient(
-                null,
+                $this->config['wsdl'],
                 array(
-                    "location" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
-                    "uri" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
+                    //"location" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
+                    //"uri" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
                     "login" => $this->config["customer"] . "__" . $this->config["user"],
                     "password" => $this->config["password"],
                     "trace" => $this->config["trace"]
@@ -341,6 +359,11 @@ class EngineApi implements LoggerAwareInterface
             );
 
             $this->connection = $connection;
+
+            if ($this->config['mailinglist']) {
+                // Select the default mailinglist
+                $this->selectMailinglist($this->config['mailinglist']);
+            }
         }
 
         return $this->connection;
