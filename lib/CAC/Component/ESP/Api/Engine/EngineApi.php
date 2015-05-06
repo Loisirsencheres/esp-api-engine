@@ -178,6 +178,40 @@ class EngineApi implements LoggerAwareInterface
         return $result;
     }
 
+    public function sendMailingWithAttachment($mailingId, array $user, $date = null, $mailinglistId = null, $attachments = array())
+    {
+        if (null === $date) {
+            $date = date("Y-m-d H:i:s");
+        }
+
+        if (null === $mailinglistId) {
+            $mailinglistId = $this->config['mailinglist'];
+        }
+
+        // Check if user is set
+        if (empty($user)) {
+            throw new EngineApiException("No user to send mailing");
+        }
+
+        $result = $this->performRequest(
+            'Subscriber_sendMailingToSubscriberWithAttachment',
+            intval($mailingId),
+            $date,
+            $user,
+            $attachments,
+            intval($mailinglistId)
+        );
+
+        if (!$result) {
+            $e = new EngineApiException(sprintf('Could not send mailing [%d]. Engine Result: [%s]', $mailingId, $result));
+            $e->setEngineCode($result);
+
+            throw $e;
+        }
+
+        return $result;
+    }
+
     /**
      * Select a Mailinglist
      *
