@@ -202,7 +202,7 @@ class EngineApi implements LoggerAwareInterface
             intval($mailinglistId)
         );
 
-        if (!$result) {
+        if (true !== $result) {
             $e = new EngineApiException(sprintf('Could not send mailing [%d]. Engine Result: [%s]', $mailingId, $result));
             $e->setEngineCode($result);
 
