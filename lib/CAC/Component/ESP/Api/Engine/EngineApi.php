@@ -149,6 +149,8 @@ class EngineApi implements LoggerAwareInterface
     {
         if (null === $date) {
             $date = date("Y-m-d H:i:s");
+        } elseif ($date instanceof \DateTime) {
+            $date = $date->format("Y-m-d H:i:s");
         }
 
         if (null === $mailinglistId) {
@@ -182,6 +184,8 @@ class EngineApi implements LoggerAwareInterface
     {
         if (null === $date) {
             $date = date("Y-m-d H:i:s");
+        } elseif ($date instanceof \DateTime) {
+            $date = $date->format("Y-m-d H:i:s");
         }
 
         if (null === $mailinglistId) {
