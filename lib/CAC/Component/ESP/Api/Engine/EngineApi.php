@@ -353,7 +353,7 @@ class EngineApi implements LoggerAwareInterface
      *
      * @throws EngineApiException Converted SoapFault Exception
      */
-    protected function performRequest($method) {
+    public function performRequest($method) {
         // Perform the SOAP request
         $args = func_get_args();
         // remove method argument
