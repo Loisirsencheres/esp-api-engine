@@ -2,8 +2,11 @@
 
 namespace CAC\Component\ESP\Api\Engine;
 
+use Doctrine\Common\Cache\PredisCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareInterface;
+use Predis\Client;
+use Predis\PredisException;
 
 /**
  * E-Ngine API Client
@@ -38,8 +41,15 @@ class EngineApi implements LoggerAwareInterface
      */
     private $config;
 
-    public function __construct(array $config)
+    /**
+     * @var Client
+     */
+    private $predisClient;
+
+    public function __construct(array $config, Client $predisClient = null)
     {
+        $this->predisClient = $predisClient;
+
         $this->config = array_replace_recursive(
             array(
                 "wsdl" => null,
@@ -125,15 +135,29 @@ class EngineApi implements LoggerAwareInterface
             $title = $subject;
         }
 
-        $mailingId = $this->performRequest(
-            'Mailing_createFromTemplate',
-            $templateId,
-            utf8_encode($title),
-            utf8_encode($subject),
-            $fromName,
-            $fromEmail,
-            $replyTo
-        );
+        $cacheString = 'Mailing_createFromTemplate#'. $templateId .'-'. md5($title .'-'. $subject .'-'. $fromName .'-'. $fromEmail .'-'. $replyTo);
+
+        try{
+            $mailingId = $this->predisClient->get($cacheString);
+        } catch (PredisException $ex){
+            $this->predisClient = null;
+        }
+
+        if (null == $mailingId) {
+            $mailingId = $this->performRequest(
+                'Mailing_createFromTemplate',
+                $templateId,
+                utf8_encode($title),
+                utf8_encode($subject),
+                $fromName,
+                $fromEmail,
+                $replyTo
+            );
+            if (null != $this->predisClient) {
+                $this->predisClient->setex($cacheString, 300, $mailingId);
+            }
+        }
+
 
         if (!is_numeric($mailingId)) {
             $e = new EngineApiException(sprintf('Could not create mailing from template. Engine Result: [%s]', $mailingId));
