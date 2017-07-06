@@ -46,9 +46,12 @@ class EngineApi implements LoggerAwareInterface
      */
     private $predisClient;
 
-    public function __construct(array $config, Client $predisClient = null)
+    private $cacheTTL;
+
+    public function __construct(array $config, Client $predisClient = null, $cacheTTL = 300)
     {
         $this->predisClient = $predisClient;
+        $this->cacheTTL = $cacheTTL;
 
         $this->config = array_replace_recursive(
             array(
@@ -154,7 +157,7 @@ class EngineApi implements LoggerAwareInterface
                 $replyTo
             );
             if (null != $this->predisClient) {
-                $this->predisClient->setex($cacheString, 300, $mailingId);
+                $this->predisClient->setex($cacheString, $this->cacheTTL, $mailingId);
             }
         }
 
