@@ -47,8 +47,20 @@ class EngineApi implements LoggerAwareInterface
     private $predisClient;
 
     private $cacheTTL;
+    /**
+     * @var
+     */
+    private $connectionTimeout;
 
-    public function __construct(array $config, Client $predisClient = null, $cacheTTL = 300)
+    /**
+     * EngineApi constructor.
+     *
+     * @param array $config
+     * @param Client|null $predisClient
+     * @param int $cacheTTL
+     * @param $connectionTimeout
+     */
+    public function __construct(array $config, Client $predisClient = null, $cacheTTL = 300, $connectionTimeout = 5)
     {
         $this->predisClient = $predisClient;
         $this->cacheTTL = $cacheTTL;
@@ -67,6 +79,7 @@ class EngineApi implements LoggerAwareInterface
             ),
             $config
         );
+        $this->connectionTimeout = $connectionTimeout;
     }
 
     /**
@@ -419,7 +432,8 @@ class EngineApi implements LoggerAwareInterface
                     //"uri" => "http" . (($this->config['secure']) ? 's' : '') . "://" . $this->config["domain"] . $this->config["path"],
                     "login" => $this->config["customer"] . "__" . $this->config["user"],
                     "password" => $this->config["password"],
-                    "trace" => $this->config["trace"]
+                    "trace" => $this->config["trace"],
+                    "connection_timeout" => $this->connectionTimeout
                 )
             );
 
