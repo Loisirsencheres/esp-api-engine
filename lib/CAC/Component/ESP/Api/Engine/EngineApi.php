@@ -2,10 +2,9 @@
 
 namespace CAC\Component\ESP\Api\Engine;
 
-use Doctrine\Common\Cache\PredisCache;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerAwareInterface;
-use Predis\Client;
+use Predis\ClientInterface;
 use Predis\PredisException;
 
 /**
@@ -42,7 +41,7 @@ class EngineApi implements LoggerAwareInterface
     private $config;
 
     /**
-     * @var Client
+     * @var ClientInterface
      */
     private $predisClient;
 
@@ -60,7 +59,7 @@ class EngineApi implements LoggerAwareInterface
      * @param int $cacheTTL
      * @param $connectionTimeout
      */
-    public function __construct(array $config, Client $predisClient = null, $cacheTTL = 300, $connectionTimeout = 5)
+    public function __construct(array $config, ClientInterface $predisClient = null, $cacheTTL = 300, $connectionTimeout = 5)
     {
         $this->predisClient = $predisClient;
         $this->cacheTTL = $cacheTTL;
